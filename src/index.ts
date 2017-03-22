@@ -31,6 +31,7 @@ export namespace Jwt {
                         File.readFile(this.jwtCert, (err, data) => {
                             if (err) {
                                 rej(err);
+                                return;
                             }
                             this.jwtSecret = data;
                             res();
@@ -55,6 +56,7 @@ export namespace Jwt {
                     JwtAuth.verify(token.slice(7), this.jwtSecret, this.jwtVerifyOptions, (err, decoded) => {
                         if (err) {
                             rej(err);
+                            return;
                         }
                         request["auth"] = decoded;
                         res();
@@ -108,6 +110,7 @@ export namespace Jwt {
                             File.readFile(this.jwtCert, (err, data) => {
                                 if (err) {
                                     rej(err);
+                                    return;
                                 }
                                 this.jwtSecret = data;
                                 res();
@@ -135,6 +138,7 @@ export namespace Jwt {
                 JwtAuth.sign(payload, jwtSecret, jwtSignOptions, (err, encoded) => {
                     if (err) {
                         rej(err);
+                        return;
                     }
                     res(encoded);
                 });
@@ -161,14 +165,21 @@ export namespace Jwt {
 
         executorInfos: { [name: string]: Kanro.Core.IExecutorInfo; };
         async getExecutor(config: Kanro.Config.IExecutorConfig): Promise<Kanro.Core.IExecutor> {
-            if (config.name == "JwtAuthenticator") {
-                return new JwtAuthenticator(<any>config);
+            switch (config.name) {
+                case "JwtAuthenticator":
+                    return new JwtAuthenticator(<any>config);
+                case "JwtSigner":
+                    return new JwtSigner(<any>config);
+                default:
+                    return undefined;
             }
-            return undefined;
         }
 
         public constructor() {
-            this.executorInfos = { JwtAuthenticator: { type: Kanro.Core.ExecutorType.RequestHandler, name: "JwtAuthenticator" } };
+            this.executorInfos = {
+                JwtAuthenticator: { type: Kanro.Core.ExecutorType.RequestHandler, name: "JwtAuthenticator" },
+                JwtSigner: { type: Kanro.Core.ExecutorType.Service, name: "JwtSigner" }
+            };
         }
     }
 }

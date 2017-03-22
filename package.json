@@ -1,13 +1,13 @@
 {
   "name": "kanro.jwt",
-  "version": "1.0.0",
+  "version": "1.0.0-dev.0",
   "description": "Json web token middleware for Kanro",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "higan@live.cn",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/jsonwebtoken": "^7.2.0",
     "@types/node": "^7.0.5"
