@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "taskName": "Publish",
+            "command": "npm",
+            "isShellCommand": true,
+            "args": [
+                "--registry=http://localhost:4873",
+                "publish"
+            ],
+            "dependsOn": "TypeScript Compile"
+        },
+        {
+            "taskName": "TypeScript Compile",
+            "command": "tsc",
+            "isShellCommand": true,
+            "args": [
+                "-p",
+                "."
+            ],
+            "showOutput": "silent",
+            "problemMatcher": "$tsc",
+            "isBuildCommand": true
+        }
+    ]
+}
