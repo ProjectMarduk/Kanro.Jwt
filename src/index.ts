@@ -2,6 +2,16 @@ import * as JwtAuth from "jsonwebtoken";
 import * as File from "fs";
 import { Kanro } from "kanro.core";
 
+declare module "kanro.core" {
+    namespace Kanro {
+        namespace Core {
+            interface IRequest {
+                auth: { [name: string]: any };
+            }
+        }
+    }
+}
+
 export namespace Jwt {
     export namespace Exceptions {
         export class JwtNoSecretException extends Kanro.Exceptions.KanroException {
@@ -58,7 +68,7 @@ export namespace Jwt {
                             rej(err);
                             return;
                         }
-                        request["auth"] = decoded;
+                        request.auth = decoded;
                         res();
                     });
                 })
