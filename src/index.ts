@@ -1,12 +1,12 @@
 import * as JwtAuth from "jsonwebtoken";
 import * as File from "fs";
-import { Kanro } from "kanro.core";
+import { Kanro } from "kanro";
 
-declare module "kanro.core" {
+declare module "kanro" {
     namespace Kanro {
-        namespace Core {
+        namespace Http {
             interface IRequest {
-                auth: { [name: string]: any };
+                auth?: { [name: string]: any };
             }
         }
     }
@@ -25,8 +25,8 @@ export namespace Jwt {
         }
     }
 
-    export class JwtAuthenticator extends Kanro.BaseRequestHandler {
-        async handler(request: Kanro.Core.IRequest): Promise<Kanro.Core.IRequest> {
+    export class JwtAuthenticator extends Kanro.Executors.BaseRequestHandler {
+        async handler(request: Kanro.Http.IRequest): Promise<Kanro.Http.IRequest> {
             let token = request.header["authorization"];
             if (token == undefined || !token.startsWith("Bearer ")) {
                 throw new Kanro.Exceptions.KanroUnauthorizedException();
@@ -80,13 +80,13 @@ export namespace Jwt {
             return request;
         }
 
-        type: Kanro.Core.ExecutorType.RequestHandler = Kanro.Core.ExecutorType.RequestHandler;
+        type: Kanro.Executors.ExecutorType.RequestHandler = Kanro.Executors.ExecutorType.RequestHandler;
         name: string = "JwtAuthenticator";
         jwtSecret: string | Buffer;
         jwtCert: string;
         jwtVerifyOptions: JwtAuth.VerifyOptions;
 
-        constructor(config: Kanro.Config.IRequestHandlerConfig) {
+        constructor(config: Kanro.Containers.IRequestHandlerContainer) {
             super(config);
             this.dependencies = { KanroManager: { name: "Kanro.Core", version: "" } };
 
@@ -102,9 +102,9 @@ export namespace Jwt {
         }
     }
 
-    export class JwtSigner implements Kanro.Core.IService {
-        dependencies: { [name: string]: Kanro.Core.IService | Kanro.Core.IModuleInfo; };
-        type: Kanro.Core.ExecutorType.Service = Kanro.Core.ExecutorType.Service;
+    export class JwtSigner implements Kanro.Executors.IService {
+        dependencies: { [name: string]: Kanro.Executors.IService | Kanro.Core.IModuleInfo; };
+        type: Kanro.Executors.ExecutorType.Service = Kanro.Executors.ExecutorType.Service;
         name: string = "JwtSigner";
         jwtSecret: string | Buffer;
         jwtCert: string;
@@ -155,8 +155,8 @@ export namespace Jwt {
             });
         }
 
-        constructor(config: Kanro.Config.IServiceConfig) {
-            this.dependencies = { KanroManager: { name: "Kanro.Core", version: "*" } };
+        constructor(config: Kanro.Containers.IServiceContainer) {
+            this.dependencies = { KanroManager: { name: "Kanro", version: "*" } };
 
             if (config["jwtSecret"] != undefined) {
                 this.jwtSecret = config["jwtSecret"];
@@ -173,8 +173,8 @@ export namespace Jwt {
     export class JwtModule implements Kanro.Core.IModule {
         dependencies: Kanro.Core.IModuleInfo[];
 
-        executorInfos: { [name: string]: Kanro.Core.IExecutorInfo; };
-        async getExecutor(config: Kanro.Config.IExecutorConfig): Promise<Kanro.Core.IExecutor> {
+        executorInfos: { [name: string]: Kanro.Executors.IExecutorInfo; };
+        async getExecutor(config: Kanro.Containers.IExecutorContainer): Promise<Kanro.Executors.IExecutor> {
             switch (config.name) {
                 case "JwtAuthenticator":
                     return new JwtAuthenticator(<any>config);
@@ -187,8 +187,8 @@ export namespace Jwt {
 
         public constructor() {
             this.executorInfos = {
-                JwtAuthenticator: { type: Kanro.Core.ExecutorType.RequestHandler, name: "JwtAuthenticator" },
-                JwtSigner: { type: Kanro.Core.ExecutorType.Service, name: "JwtSigner" }
+                JwtAuthenticator: { type: Kanro.Executors.ExecutorType.RequestHandler, name: "JwtAuthenticator" },
+                JwtSigner: { type: Kanro.Executors.ExecutorType.Service, name: "JwtSigner" }
             };
         }
     }

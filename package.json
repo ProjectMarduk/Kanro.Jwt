@@ -10,10 +10,10 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jsonwebtoken": "^7.2.0",
-    "@types/node": "^7.0.5"
+    "@types/node": "^7.0.5",
+    "kanro": "1.0.0-dev.0"
   },
   "dependencies": {
-    "jsonwebtoken": "^7.3.0",
-    "kanro.core": "^1.0.0-dev.32"
+    "jsonwebtoken": "^7.3.0"
   }
 }
